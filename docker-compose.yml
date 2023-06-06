@@ -1,0 +1,98 @@
+version: '3.8'
+services:
+  images:
+    build:
+      context: .
+      dockerfile: ./apps/images/Dockerfile
+      target: development
+    command: npm run start:dev images
+    env_file:
+      - ./apps/images/.env
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '5004:5004'
+
+  approved-items:
+    build:
+      context: .
+      dockerfile: ./apps/approved-items/Dockerfile
+      target: development
+    command: npm run start:dev approved-items
+    env_file:
+      - ./apps/approved-items/.env
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '5001:5001'
+
+  approved-items-microservice:
+    build:
+      context: .
+      dockerfile: ./apps/approved-items-microservice/Dockerfile
+      target: development
+    command: npm run start:dev approved-items-microservice
+    env_file:
+      - ./apps/approved-items-microservice/.env
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  
+  submitted-items:
+    build:
+      context: .
+      dockerfile: ./apps/submitted-items/Dockerfile
+      target: development
+    command: npm run start:dev submitted-items
+    env_file:
+      - ./apps/submitted-items/.env
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '5002:5002'
+  
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    ports:
+      - '5003:5003'
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+
+  postgres:
+    image: postgres:15.3-alpine3.18
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: sugar_comics
